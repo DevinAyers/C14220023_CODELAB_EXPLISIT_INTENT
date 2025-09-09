@@ -7,26 +7,28 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var _returnHasil : TextView
+    private lateinit var _returnHasil: TextView
 
     private val resultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ){result ->
-        
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            val selectedItem = result.data?.getStringExtra(MainActivity5.SelectedItem)
+            _returnHasil.text = selectedItem
+        }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -37,7 +39,8 @@ class MainActivity : AppCompatActivity() {
         val _dataKirim = findViewById<EditText>(R.id.dataKirim)
         val _btnExplisit2 = findViewById<Button>(R.id.btnExplisit2)
         val _btnExplisit3 = findViewById<Button>(R.id.btnExplisit3)
-        val _btnExplisit4 = findViewById<Button>(id = R.id.btnExplisit4)
+        val _btnExplisit4 = findViewById<Button>(R.id.btnExplisit4)
+        _returnHasil = findViewById(R.id.returnHasil)
 
         _btnExplisit1.setOnClickListener {
             val intent = Intent(
@@ -53,25 +56,22 @@ class MainActivity : AppCompatActivity() {
         isiPegawai.add(Pegawai(1, "Anita", "Test"))
         isiPegawai.add(Pegawai(2, "Tatik", "Marketing"))
 
-
-
         _btnExplisit3.setOnClickListener {
             val intentWithData = Intent(
                 this@MainActivity,
                 MainActivity4::class.java
             ).apply {
-                putExtra(MainActivity4.dataPegawai, isiPegawai)
+                putParcelableArrayListExtra(MainActivity4.dataPegawai, isiPegawai)
             }
             startActivity(intent)
         }
 
         _btnExplisit4.setOnClickListener {
             val intentWithResult = Intent(
-                baseContext,
+                this@MainActivity,
                 MainActivity5::class.java
             )
-            resultLauncher.launch(input = intentWithResult)
+            resultLauncher.launch(intentWithResult)
         }
-        _returnHasil = findViewById(id = R.id.returnHasil)
     }
 }
